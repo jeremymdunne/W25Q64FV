@@ -40,8 +40,8 @@ W25Q64FV_status_t W25Q64FV::enable_writing(){
     // write the enable command 
     W25Q64FV_status_t status = write_command(W25Q64FV_INSTRUCTION_WRITE_ENABLE); 
     if(status != W25Q64FV_OK) return status; 
-    _write_enabled = true; 
-    return W25Q64FV_OK; 
+    // wait until free 
+    return wait_until_free();  
 }
 
 W25Q64FV_status_t W25Q64FV::disable_writing(){
@@ -51,7 +51,6 @@ W25Q64FV_status_t W25Q64FV::disable_writing(){
     // write the enable command 
     W25Q64FV_status_t status = write_command(W25Q64FV_INSTRUCTION_WRITE_DISABLE); 
     if(status != W25Q64FV_OK) return status; 
-    _write_enabled = false; 
     return W25Q64FV_OK; 
 }
 
@@ -60,7 +59,7 @@ W25Q64FV_status_t W25Q64FV::write_page(uint32_t start_address, byte *buffer){
     // check if busy 
     if(busy()) return W25Q64FV_BUSY; 
     // check that writing is enables 
-    if(!_write_enabled) enable_writing(); 
+    enable_writing(); 
     // write the page 
     select_device(); 
     SPI.transfer(W25Q64FV_INSTRUCTION_PAGE_PROGRAM); 
@@ -98,7 +97,7 @@ W25Q64FV_status_t W25Q64FV::erase_chip(bool hold){
     // check if busy 
     if(busy()) return W25Q64FV_BUSY; 
     // check that writing is enables 
-    if(!_write_enabled) enable_writing(); 
+    enable_writing(); 
     // write the command to erase 
     W25Q64FV_status_t status = write_command(W25Q64FV_INSTRUCTION_CHIP_ERASE); 
     if(status != W25Q64FV_OK) return status; 
@@ -112,7 +111,7 @@ W25Q64FV_status_t W25Q64FV::erase_sector(uint32_t sector_address, bool hold){
     // check if busy 
     if(busy()) return W25Q64FV_BUSY; 
     // check that writing is enables 
-    if(!_write_enabled) enable_writing(); 
+    enable_writing(); 
     // write the command to erase 
     byte buffer[3]; 
     buffer[0] = sector_address >> 16; 
@@ -130,7 +129,7 @@ W25Q64FV_status_t W25Q64FV::erase_block_32(uint32_t sector_address, bool hold){
     // check if busy 
     if(busy()) return W25Q64FV_BUSY; 
     // check that writing is enables 
-    if(!_write_enabled) enable_writing(); 
+    enable_writing(); 
     // write the command to erase 
     byte buffer[3]; 
     buffer[0] = sector_address >> 16; 
@@ -148,7 +147,7 @@ W25Q64FV_status_t W25Q64FV::erase_block_64(uint32_t sector_address, bool hold){
     // check if busy 
     if(busy()) return W25Q64FV_BUSY; 
     // check that writing is enables 
-    if(!_write_enabled) enable_writing(); 
+    enable_writing(); 
     // write the command to erase 
     byte buffer[3]; 
     buffer[0] = sector_address >> 16; 
@@ -185,7 +184,7 @@ bool W25Q64FV::busy(){
     // Serial.println("Busy: "); 
     // Serial.print(busy);
     release_device(); 
-    if(busy & 0b00000001) return true; 
+    if((busy&0b00000001)) return true; 
     return false; 
 }
 

@@ -54,7 +54,7 @@
 #define W25Q64FV_INSTRUCTION_MANUFACTURER_DEVICE_ID_QUAD_IO 0x94     
 
 /********** SETTINGS **********/ 
-#define W25Q64FV_SPI_SPEED          104000000 // 104 MHz (104 max)
+#define W25Q64FV_SPI_SPEED          20000000 // 104 MHz (104 max)
 
 #define W25Q64FV_DEFAULT_TIMEOUT    5000 // Default timeout for most operations 
 #define W25Q64FV_CHIP_ERASE_TIMEOUT 100000 // Chip erase timeout. Per spec, this is typically 20 seconds, at most 100 seconds. 
@@ -228,7 +228,6 @@ public:
 private: 
     SPISettings _spi_settings;      ///< Flash chip specific SPI settings 
     int _cs;                        ///< Chip select pin 
-    bool _write_enabled = false;    ///< Flag to the enable write state 
 
     /**
      * @brief Write information to a register 
